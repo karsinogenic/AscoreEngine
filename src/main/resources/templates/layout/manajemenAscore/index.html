@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="index">
+  <body>
+    <div layout:fragment="breadcrumb_title">
+      <h1 class="d-flex fw-bold my-1 fs-3">Ascore Calculator</h1>
+      <!--end::Title-->
+      <!--begin::Breadcrumb-->
+      <ul class="breadcrumb breadcrumb-dot fs-7 my-1 fw-semibold">
+        <!-- <ul th:each="breadcrumbs : ${breadcrumb}"> -->
+        <li class="breadcrumb-item text-dark" th:each="bread,stat : ${breads}">
+          <a href="" th:href="${breads_url[stat.index]}" class="text-hover-primary" th:text="${bread}"></a>
+        </li>
+        <!-- </ul> -->
+      </ul>
+    </div>
+
+    <div layout:fragment="content">
+      <div class="row">
+        <div class="col-xl-6">
+          <div class="card card-xl-stretch mb-xl-3">
+            <!--begin::Beader-->
+            <div class="card-header border-0 py-5">
+              <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold fs-3 mb-1">Ascore Calculator</span>
+                <span class="text-muted fw-semibold fs-7">For Calculating Ascore Based On Ascore Dictionary</span>
+              </h3>
+              <div class="card-toolbar">
+                <!--begin::Menu-->
+                <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                  <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                  <span class="svg-icon svg-icon-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                      <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <rect x="5" y="5" width="5" height="5" rx="1" fill="currentColor"></rect>
+                        <rect x="14" y="5" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                        <rect x="5" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                        <rect x="14" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                      </g>
+                    </svg>
+                  </span>
+                  <!--end::Svg Icon-->
+                </button>
+              </div>
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex flex-column flex-md-row gap-5">
+                <div class="col-4">
+                  <!--begin::Label-->
+                  <label class="form-label">Parameter</label>
+                  <select class="form-select" data-control="select2" data-placeholder="Select an option" name="param" id="param0" onchange="findParam(this.value)">
+                    <option
+                      th:each="param1 : ${list_kategori}"
+                      th:id="'param_'+${param1.namaparam}"
+                      th:value="${param1.namaparam}"
+                      th:text="${param1.namaparam}"
+                      th:selected="${param1.namaparam==list_ascore[0].namaparam}"></option>
+                  </select>
+                </div>
+                <!-- <div class="flex-row-fluid">
+                  <label class="form-label">SLIK</label>
+                  <select class="form-select" data-control="select2" data-placeholder="Select an option" name="slik">
+                    <option></option>
+                    <option value="0">NON-SLIK</option>
+                    <option value="1">SLIK</option>
+                  </select>
+                </div> -->
+                <div class="flex-row-fluid">
+                  <!--begin::Label-->
+                  <label class="form-label" id="label_value0" th:text="Value">Value</label>
+                  <!--end::Label-->
+                  <!--begin::Input-->
+                  <input
+                    class="form-control"
+                    id="new_value0"
+                    name="new_value0"
+                    th:maxlength="${list_ascore==null} ?${list_ascore[0].ascoreKategori.length}:999"
+                    th:size="${list_ascore==null} ?${list_ascore[0].ascoreKategori.length}:999" />
+                  <!--end::Input-->
+                </div>
+                <!-- <div class="flex-row-fluid"> -->
+                <!--begin::Label-->
+                <!-- <label class="form-label">Slik Score</label>
+                  <input class="form-control" type="text" name="skor_slik" readonly />
+                </div>
+                <div class="flex-row-fluid"> -->
+                <!--begin::Label-->
+                <!-- <label class="form-label">NonSlik Score</label>
+                  <input class="form-control" type="text" name="skor_nonslik" readonly />
+                </div> -->
+              </div>
+              <div id="loop_param"></div>
+
+              <div class="d-flex flex-column mt-2">
+                <center>
+                  <button type="button" class="btn btn-primary me-10" id="tambah_btn" onclick="tambahParam()">
+                    <span class="indicator-label"> Tambah </span>
+                    <span class="indicator-progress"><span class="spinner-border spinner-border-sm align-middle ms-2"></span> </span>
+                  </button>
+                  <button type="button" class="btn btn-danger me-10" id="kurang_btn" onclick="kurangParam()">
+                    <span class="indicator-label">Kurang</span>
+                    <span class="indicator-progress"><span class="spinner-border spinner-border-sm align-middle ms-2"></span> </span>
+                  </button>
+                  <button type="button" class="btn btn-success me-10" id="submit_btn" onclick="hitungAscore()">
+                    <span class="indicator-label"> Submit </span>
+                    <span class="indicator-progress"><span class="spinner-border spinner-border-sm align-middle ms-2"></span> </span>
+                  </button>
+                </center>
+              </div>
+              <div class="d-flex align-items-center flex-column mt-2 flex-md-row gap-5">
+                <div class="col-3 mt-3">
+                  <h3>Total :</h3>
+                </div>
+                <div class="flex-row-fluid">
+                  <!--begin::Label-->
+                  <label class="form-label">Slik Score</label>
+                  <input class="form-control" type="text" name="total_skor_slik" id="total_skor_slik" value="" />
+                </div>
+                <div class="flex-row-fluid">
+                  <!--begin::Label-->
+                  <label class="form-label">NonSlik Score</label>
+                  <input class="form-control" type="text" name="total_skor_nonslik" id="total_skor_nonslik" value="" />
+                </div>
+              </div>
+            </div>
+            <!--end::Body-->
+          </div>
+        </div>
+
+        <div class="col-xl-6">
+          <div class="card card-xl-stretch mb-xl-3">
+            <!--begin::Beader-->
+            <div class="card-header border-0 py-5">
+              <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold fs-3 mb-1">Ascore Dictionary</span>
+                <span class="text-muted fw-semibold fs-7">List of Ascore's Parameter and Point</span>
+              </h3>
+              <div class="card-toolbar">
+                <!--begin::Menu-->
+                <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                  <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                  <span class="svg-icon svg-icon-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                      <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <rect x="5" y="5" width="5" height="5" rx="1" fill="currentColor"></rect>
+                        <rect x="14" y="5" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                        <rect x="5" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                        <rect x="14" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                      </g>
+                    </svg>
+                  </span>
+                  <!--end::Svg Icon-->
+                </button>
+              </div>
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body d-flex flex-column">
+              <table id="kt_datatable_both_scrolls" class="table table-row-bordered gy-5 gs-7">
+                <thead>
+                  <tr class="fw-semibold">
+                    <!-- <th class="min-w-100px">Nomer</th> -->
+                    <th class="min-w-100px">Nama Parameter</th>
+                    <th class="min-w-50px">Length</th>
+                    <th class="min-w-100px">Operator</th>
+                    <th class="min-w-50px">Slik</th>
+                    <th class="min-w-50px text-center">Value1</th>
+                    <th class="min-w-50px text-center">Value2</th>
+                    <th class="min-w-100px">Value</th>
+                    <th class="min-w-50px">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="" th:each="list:${list_ascore}">
+                    <!-- <td th:text="${list.id}"></td> -->
+                    <td th:text="${list.kategoriAscore.namaparam}"></td>
+                    <td th:text="${list.kategoriAscore.length}"></td>
+                    <td th:text="${list.kategoriAscore.operator}"></td>
+                    <td th:text="${list.is_slik} ? 'SLIK' : 'NON-SLIK'">SLIK</td>
+                    <td class="text-center" th:text="${list.value1}?:'-'"></td>
+                    <td class="text-center" th:text="${list.value2}?:'-'"></td>
+                    <td class="text-center" th:text="${list.value_str}?:'-'"></td>
+                    <td th:text="${list.score}"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!--end::Body-->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <script> -->
+
+    <th:block layout:fragment="script">
+      <script>
+        $("#kt_datatable_both_scrolls").DataTable({
+          scrollY: 300,
+          scrollX: true,
+          scrollCollapse: true,
+          fixedColumns: {
+            left: 4,
+          },
+        });
+
+        var button = document.querySelector("#tambah_btn");
+        var button1 = document.querySelector("#kurang_btn");
+        var button2 = document.querySelector("#submit_btn");
+
+        $(document)
+          .ajaxStart(function () {
+            button.setAttribute("data-kt-indicator", "on");
+            button1.setAttribute("data-kt-indicator", "on");
+            button2.setAttribute("data-kt-indicator", "on");
+            button.setAttribute("disabled", true);
+            button1.setAttribute("disabled", true);
+            button2.setAttribute("disabled", true);
+          })
+          .ajaxStop(function () {
+            setTimeout(function () {
+              button1.removeAttribute("data-kt-indicator");
+              button2.removeAttribute("data-kt-indicator");
+              button.removeAttribute("data-kt-indicator");
+            }, 1000);
+            button.removeAttribute("disabled");
+            button1.removeAttribute("disabled");
+            button2.removeAttribute("disabled");
+          });
+
+        let new_content = "";
+        let arr_params = [];
+        let arr_values = [];
+        let iter = 0;
+
+        let distinct_op_params = [];
+
+        $(function () {
+          $.ajax({
+            url: "/api/getOperator?operator=BETWEEN",
+            type: "get",
+            contentType: "application/json",
+            success: function (data) {
+              distinct_op_params = data;
+              console.log(distinct_op_params);
+            },
+          });
+        });
+
+        function kurangParam() {
+          if (iter > 0) {
+            $("#kurang_btn").attr("disabled", false);
+            $("#isi_content" + iter).remove();
+            iter--;
+            arr_params.pop();
+            arr_values.pop();
+            $("#param" + iter).attr("disabled", false);
+          } else {
+            $("#kurang_btn").attr("disabled", true);
+          }
+        }
+
+        function hitungAscore() {
+          arr_params = [];
+          arr_values = [];
+          for (let i = 0; i <= iter; i++) {
+            arr_params.push($("#param" + i).val());
+            arr_values.push($("#new_value" + i).val());
+            console.log(arr_values);
+          }
+
+          for (let j = 0; j <= iter; j++) {
+            if (arr_values[j] == null || arr_values[j] == "") {
+              arr_params.pop();
+              arr_values.pop();
+              return alert("value tidak boleh kosong");
+            }
+          }
+          let str_json = "";
+          for (let i = 0; i < arr_values.length; i++) {
+            if (distinct_op_params.includes(arr_params[i])) {
+              str_json += `"${arr_params[i]}":"${arr_values[i]}"`;
+            } else {
+              str_json += `"${arr_params[i]}":${arr_values[i]}`;
+            }
+            if (i < arr_values.length - 1) {
+              str_json += `,`;
+            }
+          }
+          let json_score = "{" + str_json + "}";
+          console.log(str_json);
+          console.log(json_score);
+          $.ajax({
+            url: "/api/score",
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            data: json_score,
+            success: function (data) {
+              console.log(data.slik);
+              $("#total_skor_slik").val(data.slik);
+              $("#total_skor_nonslik").val(data.nonslik);
+            },
+            error: function () {
+              alert("Value Type Error");
+            },
+          });
+        }
+
+        function findParam(param) {
+          $("#new_value" + iter).val("");
+          $.ajax({
+            url: "/api/getParam?param=" + param,
+            type: "get",
+            contentType: "application/json",
+            success: function (data) {
+              if (data.length == null) {
+                $("#new_value" + iter).removeAttr("maxlength");
+                $("#new_value" + iter).removeAttr("size");
+              } else {
+                $("#new_value" + iter).attr("maxlength", data.length);
+                $("#new_value" + iter).attr("size", data.length);
+              }
+
+              if (data.description == null || data.description == "") {
+                $("#label_value" + iter).html("Value");
+              } else {
+                $("#label_value" + iter).html("Value(" + data.description + ")");
+              }
+            },
+          });
+        }
+
+        function cariParam(json_params, iter) {
+          $.ajax({
+            url: "/api/getNotInParam",
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(json_params),
+            success: function (data) {
+              console.log(data);
+              let add_content = `<div class="d-flex flex-column flex-md-row gap-5" id="isi_content${iter}">
+                  <div class="col-4">
+                    <!--begin::Label-->
+                    <label class="form-label">Parameter</label>
+                    <select class="form-select" data-control="select2" data-placeholder="Select an option" id="param${iter}" name="param${iter}" onchange="findParam(this.value)">`;
+              for (let i = 0; i < data.length; i++) {
+                add_content += `<option id="param_${data[i].namaparam}" value="${data[i].namaparam}">${data[i].namaparam}</option>`;
+              }
+              add_content += `</select>
+                  </div>
+
+                  <div class="flex-row-fluid">
+                    <!--begin::Label-->`;
+              if (data[0].description == null || data[0].description == "") {
+                add_content += `<label class="form-label" id="label_value${iter}">Value</label>`;
+              } else {
+                add_content += `<label class="form-label" id="label_value${iter}">Value(${data[0].description})</label>`;
+              }
+              add_content += `<!--end::Label-->
+                    <!--begin::Input-->
+                    <input class="form-control" id="new_value${iter}" name="new_value${iter}" size="${data[0].length}" maxlength="${data[0].length}" />
+                    <!--end::Input-->
+                  </div>
+
+                </div>`;
+
+              ////console.log(new_content);
+              $("#loop_param").append(add_content);
+            },
+          });
+        }
+
+        function tambahParam() {
+          if ($("#new_value" + iter).val() != null && $("#new_value" + iter).val() != "") {
+            if (iter == 0) {
+              arr_params.splice(0, 1, $("#param" + iter).val());
+              arr_values.splice(0, 0, $("#new_value" + iter).val());
+            } else {
+              arr_params.push($("#param" + iter).val());
+              arr_values.push($("#new_value" + iter).val());
+            }
+
+            $("#param" + iter).attr("disabled", true);
+            //console.log($("#new_value" + iter).val());
+            //console.log(iter);
+            let params = arr_params.toString();
+            let json_params = { param: params };
+
+            iter++;
+
+            if (iter > 0) {
+              $("#kurang_btn").attr("disabled", false);
+            } else {
+              $("#kurang_btn").attr("disabled", true);
+            }
+            cariParam(json_params, iter);
+          } else {
+            alert("Value tidak boleh kosong");
+          }
+        }
+      </script>
+    </th:block>
+
+    <!-- </script> -->
+  </body>
+</html>

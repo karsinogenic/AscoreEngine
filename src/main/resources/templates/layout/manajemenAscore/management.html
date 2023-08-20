@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="index">
+  <body>
+    <div layout:fragment="breadcrumb_title">
+      <h1 class="d-flex fw-bold my-1 fs-3">Ascore Management</h1>
+      <!--end::Title-->
+      <!--begin::Breadcrumb-->
+      <ul class="breadcrumb breadcrumb-dot fs-7 my-1 fw-semibold">
+        <!-- <ul th:each="breadcrumbs : ${breadcrumb}"> -->
+        <li class="breadcrumb-item" th:each="bread,stat : ${breads}">
+          <a href="" th:href="${breads_url[stat.index]}" class="text-hover-primary text-dark" th:text="${bread}"></a>
+        </li>
+        <!-- </ul> -->
+      </ul>
+    </div>
+
+    <div layout:fragment="content">
+      <div class="card">
+        <div class="card-header border-0 py-5">
+          <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold fs-3 mb-1">List Ascore</span>
+            <span class="text-muted fw-semibold fs-7"></span>
+          </h3>
+          <div class="card-toolbar">
+            <!--begin::Menu-->
+            <div class="d-flex justify-content-end">
+              <a href="/ascore_management/kategori" id="ke_kategori_btn" class="btn btn-primary me-2">Ke Kategori</a>
+              <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#form_modal" id="modal_ascore_btn" onclick="changeModal()">Create</button>
+              <div class="position-relative">
+                <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor"></rect>
+                    <path
+                      d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
+                      fill="currentColor"></path>
+                  </svg>
+                </span>
+                <!--end::Svg Icon-->
+                <input type="text" class="form-control form-control-solid ps-10" id="search" name="search" value="" placeholder="Search" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="wrapper-table1">
+            <table id="kt_datatable_both_scrolls" class="table table-row-bordered gy-5 gs-7">
+              <thead>
+                <tr class="fw-semibold">
+                  <th class="min-w-100px">Nomer</th>
+                  <th class="min-w-100px">Nama Parameter</th>
+                  <th class="min-w-100px">Operator</th>
+                  <th class="min-w-100px">Slik</th>
+                  <th class="min-w-100px text-center">Value1</th>
+                  <th class="min-w-100px text-center">Value2</th>
+                  <th class="min-w-100px">Value</th>
+                  <th class="min-w-100px">Score</th>
+                  <th class="min-w-100px">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="" th:each="list,iter:${list_ascore}">
+                  <td th:text="${iter.index+1}"></td>
+                  <td th:text="${list.kategoriAscore!=NULL}?${list.kategoriAscore.namaparam}:${list.namaparam} "></td>
+                  <td th:text="${list.kategoriAscore!=NULL}?${list.kategoriAscore.operator}:'Not Valid' "></td>
+                  <td th:text="${list.is_slik} ? 'SLIK' : 'NON-SLIK'">SLIK</td>
+                  <td class="text-center" th:text="${#numbers.formatInteger(list.value1, 0, 'COMMA')}?:'-'"></td>
+                  <td class="text-center" th:text="${#numbers.formatInteger(list.value2, 0, 'COMMA')}?:'-'"></td>
+                  <td class="text-center" th:text="${list.value_str}?:'-'"></td>
+                  <td th:text="${list.score}"></td>
+                  <td>
+                    <button th:value="${list.id}" onclick="editItem(this.value)" class="btn btn-primary min-w-50px">Edit</button>
+                    <button th:value="${list.id}" onclick="deleteItem(this.value)" class="btn btn-danger min-w-50px">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" tabindex="-1" data-bs-backdrop="static" id="form_modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Tambah Ascore</h3>
+
+              <!--begin::Close-->
+              <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <span class="svg-icon svg-icon-1"></span>
+              </div>
+              <!--end::Close-->
+            </div>
+
+            <form action="" method="POST" id="form_ascore">
+              <div class="modal-body">
+                <input type="hidden" id="hide_id" value="" />
+                <div class="mb-10">
+                  <label for="exampleFormControlInput1" class="required form-label">Nama Parameter</label>
+                  <select class="form-select form-select-solid" data-control="select2" name="namaparam" id="namaparam" onchange="findParam(this.value)">
+                    <option th:each="list : ${list_kategori}" th:value="${list.namaparam}" th:text="${list.namaparam}" th:id="id_+${list.namaparam}"></option>
+                  </select>
+                </div>
+
+                <div class="mb-10">
+                  <div class="d-flex flex-column flex-md-row gap-5">
+                    <div class="flex-row-fluid">
+                      <label for="exampleFormControlInput1" class="required form-label">Operator</label>
+                      <select class="form-select form-select-solid" data-control="select2" name="operator" id="operator" disabled>
+                        <option th:selected="${list_kategori[0].operator=='EQUAL'}" id="option_equal" value="EQUAL">EQUAL</option>
+                        <!-- <option value="MORETHANEQUAL">>=</option>
+                        <option value="LESSTHANEQUAL"><=</option> -->
+                        <option th:selected="${list_kategori[0].operator=='BETWEEN'}" id="option_between" value="BETWEEN">BETWEEN</option>
+                        <option th:selected="${list_kategori[0].operator=='LENGTH'}" id="option_length" value="LENGTH">LENGTH</option>
+                      </select>
+                    </div>
+                    <div class="flex-row-fluid">
+                      <label for="exampleFormControlInput1" class="required form-label">Slik/NonSlik</label>
+                      <select class="form-select form-select-solid" data-control="select2" name="is_slik" id="is_slik">
+                        <option id="slik" value="true">Slik</option>
+                        <option id="nonslik" value="false">NonSlik</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-10">
+                  <div class="d-flex flex-column flex-md-row gap-5">
+                    <div class="flex-row-fluid" id="value1_group" hidden>
+                      <label for="exampleFormControlInput1" class="required form-label">Value 1</label>
+                      <input type="number" class="form-control form-control-solid" name="value1" id="value1" th:placeholder="${list_kategori[0].length+' digit'}" max="9999999999999999999"/>
+                    </div>
+                    <div class="flex-row-fluid" id="value2_group" hidden>
+                      <label for="exampleFormControlInput1" class="required form-label">Value 2</label>
+                      <input type="number" class="form-control form-control-solid" name="value2" id="value2" th:placeholder="${list_kategori[0].length+' digit'}" max="9999999999999999999"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-10" id="valuestr_group">
+                  <label for="exampleFormControlInput1" class="required form-label">Value</label>
+                  <input type="hidden" id="hide_size" th:value="${list_kategori[0].length==null} ? '':(${list_kategori[0].operator=='LENGTH'}?${list_kategori[0].trim_length}:${list_kategori[0].length}) ">
+                  <input
+                    type="text"
+                    class="form-control form-control-solid"
+                    name="value_str"
+                    id="value_str"
+                    th:placeholder="${list_kategori[0].length==null} ? '':(${list_kategori[0].operator=='LENGTH'}?${list_kategori[0].trim_length + ' digit'}:${list_kategori[0].length +' digit'}) "
+                    th:size="${list_kategori[0].length==null} ? '':(${list_kategori[0].operator=='LENGTH'}?${list_kategori[0].trim_length}:${list_kategori[0].length}) "
+                    th:maxlength="${list_kategori[0].length==null} ? '':(${list_kategori[0].operator=='LENGTH'}?${list_kategori[0].trim_length}:${list_kategori[0].length}) " 
+                    onkeyup="cekMinus(this.value)"/>
+                </div>
+                <!-- <div class="mb-10" id="length_group" hidden>
+                  <div class="d-flex flex-column flex-md-row gap-5">
+                    <div class="flex-row-fluid" id="location_div">
+                      <label for="exampleFormControlInput1" class="required form-label">Kiri/Kanan</label>
+                      <select class="form-select form-select-solid" data-control="select2" name="kiri_kanan" id="kiri_kanan">
+                        <option value="kiri">Kiri</option>
+                        <option value="kanan">Kanan</option>
+                      </select>
+                    </div> -->
+                <!-- <div class="flex-row-fluid" id="length_div">
+                      <label for="exampleFormControlInput1" class="required form-label">Length</label>
+                      <input type="number" class="form-control form-control-solid" name="length" id="length" />
+                    </div>
+                  </div>
+                </div> -->
+                <div class="mb-10">
+                  <label for="exampleFormControlInput1" class="required form-label">Score</label>
+                  <input type="number" class="form-control form-control-solid" name="score" id="score" />
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" onclick="resetVal()" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" value="" onclick="postAscore(this.value)" id="post_ascore">Submit</button>
+                <!-- <button type="button" class="btn btn-primary" onclick="editAscore()" id="edit_ascore" hidden>Submit</button> -->
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <th:block layout:fragment="script">
+      <script>
+        $("#datatable_test").DataTable({
+          pageLength: 5,
+          columnDefs: [{ width: "20%" }],
+        });
+        var table = $("#kt_datatable_both_scrolls").DataTable({
+          scrollY: 800,
+          scrollX: true,
+          scrollCollapse: true,
+          fixedColumns: {
+            left: 4,
+          },
+          //order: [0, "desc"],
+        });
+        $("#kt_datatable_both_scrolls1").DataTable({
+          scrollY: 800,
+          scrollX: true,
+          scrollCollapse: true,
+          fixedColumns: {
+            left: 4,
+          },
+          //order: [0, "desc"],
+        });
+
+        function resetVal(){
+          // console.log($("#namaparam").val());
+          $("#namaparam:selected").removeAttr("selected")
+          // $("#namaparam").val("")
+          console.log($("#namaparam").val());
+        }
+        
+        function cekMinus(val){
+          let size= $("#hide_size").val();
+          // console.log(parseInt(siz))
+
+          if(val.includes("-")){
+            $("#value_str").attr("size",parseInt(size)+1);
+            $("#value_str").attr("maxlength",parseInt(size)+1);
+          }
+        }
+
+
+        $("#search").on("keyup", function () {
+          table.search(this.value).draw();
+        });
+        function changeModal() {
+          findParam($("#namaparam").val());
+        }
+
+        function findParam(param) {
+          $.ajax({
+            url: "/api/getParam?param=" + param,
+            type: "get",
+            contentType: "application/json",
+            success: function (data) {
+              if (data != null) {
+                $("#value1").attr("size", data.length);
+                $("#value2").attr("size", data.length);
+                $("#value_str").attr("size", data.length);
+                $("#value1").attr("maxlength", data.length);
+                $("#value2").attr("maxlength", data.length);
+                $("#value_str").attr("maxlength", data.length);
+                $("#value1").attr("placeholder", data.length + " digit");
+                $("#value2").attr("placeholder", data.length + " digit");
+                $("#value_str").attr("placeholder", data.length + " digit");
+                if (data.length == null) {
+                  $("#value1").removeAttr("size");
+                  $("#value2").removeAttr("size");
+                  $("#value_str").removeAttr("size");
+                  $("#value1").removeAttr("maxlength");
+                  $("#value2").removeAttr("maxlength");
+                  $("#value_str").removeAttr("maxlength");
+                  $("#value1").removeAttr("placeholder");
+                  $("#value2").removeAttr("placeholder");
+                  $("#value_str").removeAttr("placeholder");
+                }
+
+                if (data.operator == "EQUAL") {
+                  $("#option_equal").attr("selected", true);
+                  $("#option_length").attr("selected", false);
+                  $("#option_between").attr("selected", false);
+
+                  $("#value1_group").attr("hidden", true);
+                  $("#value2_group").attr("hidden", true);
+                  $("#valuestr_group").attr("hidden", false);
+                  //$("#length_group").attr("hidden", true);
+                  $("#value1").val("");
+                  $("#value2").val("");
+                } else if (data.operator == "LENGTH") {
+                  $("#option_length").attr("selected", true);
+                  $("#option_equal").attr("selected", false);
+                  $("#option_between").attr("selected", false);
+
+                  $("#value1_group").attr("hidden", true);
+                  $("#value2_group").attr("hidden", true);
+                  $("#valuestr_group").attr("hidden", false);
+
+                  $("#value_str").attr("maxlength", data.trim_length);
+                  $("#value_str").attr("size", data.trim_length);
+                  $("#value_str").attr("placeholder", data.trim_length + " digit");
+
+                  $("#value_str").val("");
+                } else if (data.operator == "BETWEEN") {
+                  $("#option_between").attr("selected", true);
+                  $("#option_equal").attr("selected", false);
+                  $("#option_length").attr("selected", false);
+
+                  $("#value1_group").attr("hidden", false);
+                  $("#value2_group").attr("hidden", false);
+                  $("#valuestr_group").attr("hidden", true);
+
+                  $("#value_str").val("");
+                }
+              }
+
+              //if (data.description == null || data.description == "") {
+              //$("#label_value" + iter).html("Value");
+              //} else {
+              //$("#label_value" + iter).html("Value(" + data.description + ")");
+              //}
+            },
+          });
+        }
+
+        function deleteItem(val) {
+          $.ajax({
+            url: "/api/delete?id=" + val,
+            type: "put",
+            contentType: "application/json",
+            success: function (data) {
+              // console.log(data);
+              location.reload();
+            },
+          });
+        }
+
+        function editItem(val) {
+          $("#form_modal").modal("show");
+          $("#hide_id").val(val);
+          $("#post_ascore").val("edit");
+          $.ajax({
+            url: "/api/getById?id=" + val,
+            type: "get",
+            contentType: "application/json",
+            success: function (data1) {
+              // console.log(data1.namaparam);
+              // console.log($("#namaparam").val());
+              // $("option:selected").removeAttr("selected");
+              $("#id_" + data1.namaparam).attr("selected",true);
+              $("#namaparam").val(data1.namaparam)
+              //findParam(data1.namaparam);
+              // console.log(data1.kategoriAscore.operator);
+              if (data1.kategoriAscore.operator == "BETWEEN") {
+                // console.log("BETWEEN");
+                $("#value1").val(data1.value1);
+                $("#value2").val(data1.value2);
+                $("#score").val(data1.score);
+
+                $("#option_equal").attr("selected", false);
+                $("#option_length").attr("selected", false);
+                $("#option_between").attr("selected", true);
+
+                $("#value1_group").attr("hidden", false);
+                $("#value2_group").attr("hidden", false);
+                $("#valuestr_group").attr("hidden", true);
+              } else if (data1.kategoriAscore.operator == "EQUAL") {
+                  $("#option_equal").attr("selected", true);
+                  $("#option_length").attr("selected", true);
+                  $("#option_between").attr("selected", false);
+                } else {
+                  $("#option_equal").attr("selected", false);
+                  $("#option_length").attr("selected", true);
+                  $("#option_between").attr("selected", false);
+                }
+                $("#value_str").val(data1.value_str);
+                // console.log($("#value_str").val());
+                $("#score").val(data1.score);
+              
+              if (data1.is_slik) {
+                $("#slik").attr("selected", true);
+              } else {
+                $("#nonslik").attr("selected", true);
+              }
+            },
+          });
+        
+        }
+
+        let int_params = ["value1", "value2", "score", "is_slik"];
+        //let length_params = ["kiri_kanan"];
+
+        let redirects = false;
+
+        function postAscore(val) {
+          const form = document.querySelector("form");
+          const formData = new FormData(form);
+          let val1 = $('#value1').val();
+          let val2 = $('#value2').val();
+          if(val1.length >18||val2.length>18){
+            toastr.error("value1 atau value2 lebih dari 18 digit");
+          }else{
+          let str_json = "";
+          for (const pair of formData.entries()) {
+            if (pair[1] != "") {
+              if (int_params.includes(pair[0])) {
+                str_json += `"${pair[0]}":${pair[1]}`;
+              } else {
+                str_json += `"${pair[0]}":"${pair[1]}"`;
+              }
+              str_json += `,`;
+            }
+          }
+          str_json += `"status_data":true`;
+          // console.log(str_json);
+          let new_url = "/api/postAscore";
+          if (val == "edit") {
+            new_url = "/api/editAscore";
+            str_json += `,"id":` + $("#hide_id").val();
+          }
+          let json_post = "{" + str_json + "}";
+          // console.log(JSON.parse(json_post));
+          $.ajax({
+            url: new_url,
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            data: json_post,
+            success: function (data) {
+              if (data.status.includes("Berhasil") == false) {
+                toastr.error(data.status);
+                redirects = false;
+              } else {
+                toastr.success("Berhasil menginput data");
+                location.href = "/ascore_management";
+                redirects = true;
+              }
+            },
+            error: function (err) {
+              // console.log(err);
+            },
+          });
+          // console.log(redirects);
+          if (redirects) {
+            location.href = "/ascore_management";
+          }
+        }
+          //test.replace("%3D", "=")
+        }
+        function test1() {
+          $.ajax({
+            url: "/postKategoriAscore",
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            data: $("form#form_ascore").serialize(),
+            success: function (data) {
+              // console.log(data);
+            },
+          });
+        }
+
+        function skip2() {
+          stepper.goNext();
+          stepper.goNext();
+          $("#btn_group3").attr("hidden", false);
+          $("#btn_group2").attr("hidden", true);
+          $("#btn_group1").attr("hidden", true);
+        }
+        function skip1() {
+          $("#btn_group3").attr("hidden", true);
+          $("#btn_group2").attr("hidden", false);
+          $("#btn_group1").attr("hidden", true);
+        }
+
+        function changeMenu(val) {
+          // console.log(val);
+          if (val == "kategori") {
+            $("#modal_ascore_btn").attr("hidden", true);
+            $("#modal_kategori_btn").attr("hidden", false);
+            $(".wrapper-table2").attr("hidden", false);
+            $(".wrapper-table1").attr("hidden", true);
+            $("#ke_kategori_btn").html("Ke Ascore");
+            $("#ke_kategori_btn").val("ascore");
+          } else {
+            $(".wrapper-table1").attr("hidden", true);
+            $(".wrapper-table2").attr("hidden", false);
+            $("#modal_ascore_btn").attr("hidden", false);
+            $("#modal_kategori_btn").attr("hidden", true);
+            $("#ke_kategori_btn").html("Ke Kategori");
+            $("#ke_kategori_btn").val("kategori");
+          }
+        }
+      </script>
+    </th:block>
+  </body>
+</html>

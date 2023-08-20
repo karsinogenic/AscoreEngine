@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="index">
+  <body>
+    <div layout:fragment="breadcrumb_title">
+      <h1 class="d-flex fw-bold my-1 fs-3">Ascore Management Kategori</h1>
+      <!--end::Title-->
+      <!--begin::Breadcrumb-->
+      <ul class="breadcrumb breadcrumb-dot fs-7 my-1 fw-semibold">
+        <!-- <ul th:each="breadcrumbs : ${breadcrumb}"> -->
+        <li class="breadcrumb-item" th:each="bread,stat : ${breads}">
+          <a href="" th:href="${breads_url[stat.index]}" class="text-hover-primary text-dark" th:text="${bread}"></a>
+        </li>
+        <!-- </ul> -->
+      </ul>
+    </div>
+
+    <div layout:fragment="content">
+      <div class="card">
+        <div class="card-header border-0 py-5">
+          <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold fs-3 mb-1" id="title-card">List Kategori Ascore Active</span>
+            <span class="text-muted fw-semibold fs-7"></span>
+          </h3>
+          <div class="card-toolbar">
+            <!--begin::Menu-->
+            <div class="d-flex justify-content-end">
+              <!-- <a id="ke_kategori_btn" href="/ascore_management" class="btn btn-primary me-2">Ke Ascore</a> -->
+              <a id="ke_kategori_btn" href="/ascore_management" class="btn btn-primary me-2">Ke Ascore</a>
+              <button class="btn btn-primary me-2" onclick="reactivedKategori()" id="btn-reactived">NonAktif Kategori</button>
+              <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#form_modal_kategori" id="modal_kategori_btn">Create</button>
+              <div class="position-relative">
+                <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor"></rect>
+                    <path
+                      d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
+                      fill="currentColor"></path>
+                  </svg>
+                </span>
+                <!--end::Svg Icon-->
+                <input type="text" class="form-control form-control-solid ps-10" id="search" name="search" value="" placeholder="Search" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" id="kategori-aktif">
+          <div class="wrapper-table2">
+            <table id="kt_datatable_both_scrolls1" class="table table-row-bordered gy-5 gs-7">
+              <thead>
+                <tr class="fw-semibold">
+                  <th class="min-w-100px">Nomer</th>
+                  <th class="min-w-100px">Nama Parameter</th>
+                  <th class="min-w-100px">Operator</th>
+                  <th class="min-w-100px">Panjang</th>
+                  <th class="min-w-100px">Trim Panjang</th>
+                  <th class="min-w-100px">Deskripsi</th>
+                  <th class="min-w-100px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="" th:each="list,iter:${list_kategori}">
+                  <td th:text="${iter.index+1}"></td>
+                  <td th:text="${list.namaparam!=NULL}?${list.namaparam}:'-' "></td>
+                  <td th:text="${list.operator!=NULL}?${list.operator}:'Not Valid' "></td>
+                  <td th:text="${list.length} ?: '-'"></td>
+                  <td th:text="${list.trim_length} ?: '-'"></td>
+                  <td th:text="${list.description} ?: '-'"></td>
+                  <td>
+                    <button th:value="${list.id}" onclick="editKategori(this.value)" class="btn btn-primary min-w-50px">Edit</button>
+                    <button th:value="${list.id}" onclick="deleteKategori(this.value)" class="btn btn-danger min-w-50px">NonAktif</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card-body d-none" id="kategori-nonaktif" style="width: 100%;">
+          <div class="wrapper-table2">
+            <table id="kt_datatable_both_scrolls2" class="table table-row-bordered gy-5 gs-7">
+              <thead>
+                <tr class="fw-semibold">
+                  <th class="min-w-100px">Nomer</th>
+                  <th class="min-w-100px">Nama Parameter</th>
+                  <th class="min-w-100px">Operator</th>
+                  <th class="min-w-100px">Panjang</th>
+                  <th class="min-w-100px">Trim Panjang</th>
+                  <th class="min-w-100px">Deskripsi</th>
+                  <th class="min-w-100px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="" th:each="list,iter:${list_kategori_nonaktif}">
+                  <td th:text="${iter.index+1}"></td>
+                  <td th:text="${list.namaparam!=NULL}?${list.namaparam}:'-' "></td>
+                  <td th:text="${list.operator!=NULL}?${list.operator}:'Not Valid' "></td>
+                  <td th:text="${list.length} ?: '-'"></td>
+                  <td th:text="${list.trim_length} ?: '-'"></td>
+                  <td th:text="${list.description} ?: '-'"></td>
+                  <td>
+                    <button th:value="${list.id}" onclick="editKategori(this.value)" class="btn btn-primary min-w-50px">Edit</button>
+                    <button th:value="${list.id}" onclick="aktivasiKategori(this.value)" class="btn btn-success min-w-50px">Aktif</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" tabindex="-1" data-bs-backdrop="static" id="form_modal_kategori">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Tambah Kategori Ascore</h3>
+
+              <!--begin::Close-->
+              <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <span class="svg-icon svg-icon-1"></span>
+              </div>
+              <!--end::Close-->
+            </div>
+
+            <form action="" method="POST" id="form_ascore">
+              <div class="modal-body">
+                <input type="hidden" id="hide_id" value="" />
+                <div class="mb-10">
+                  <label for="exampleFormControlInput1" class="required form-label">Nama Parameter</label>
+                  <input type="text" id="namaparam" name="namaparam" class="form-control form-control-solid" />
+                </div>
+                <div class="mb-10">
+                  <label for="exampleFormControlInput1" class="required form-label">Operator</label>
+                  <select class="form-select form-select-solid" data-control="select2" name="operator" id="operator" onchange="changeOperator(this.value)">
+                    <option id="option_equal" value="EQUAL">EQUAL</option>
+                    <option id="option_between" value="BETWEEN">BETWEEN</option>
+                    <option id="option_length" value="LENGTH">LENGTH</option>
+                  </select>
+                </div>
+                <div class="mb-10">
+                  <label for="exampleFormControlInput1" class="required form-label">Length</label>
+                  <input type="number" name="length" id="length" class="form-control form-control-solid" />
+                </div>
+                <div class="mb-10" id="length_group" hidden>
+                  <label for="exampleFormControlInput1" class="required form-label">Trim Length</label>
+                  <input type="number" name="trim_length" id="trim_length" class="form-control form-control-solid" />
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" value="" onclick="postAscore(this.value)" id="post_ascore">Submit</button>
+                <!-- <button type="button" class="btn btn-primary" onclick="editAscore()" id="edit_ascore" hidden>Submit</button> -->
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <th:block layout:fragment="script">
+      <script>
+        $(function(){
+          var delayInMilliseconds = 1000; //1 second
+          $("#kt_content").attr("hidden",true)
+          $("#loading-dialog").modal("show")
+          setTimeout(function() {
+            $("#loading-dialog").modal("hide")
+            $("#kt_content").attr("hidden",false)
+          }, delayInMilliseconds);
+
+        })
+        $("#datatable_test").DataTable({
+          pageLength: 5,
+          columnDefs: [{ width: "20%" }],
+        });
+
+        let table = $("#kt_datatable_both_scrolls1").DataTable({
+          scrollY: 300,
+          scrollX: true,
+          scrollCollapse: true,
+          fixedColumns: {
+            left: 4,
+          },
+          //order: [0, "desc"],
+        });
+        let table2 = $("#kt_datatable_both_scrolls2").DataTable({
+          scrollY: 300,
+          scrollX: true,
+          scrollCollapse: true,
+          fixedColumns: {
+            left: 4,
+          },
+          //order: [0, "desc"],
+        });
+
+        $("#search").on("keyup", function () {
+          table.search(this.value).draw();
+        });
+
+        let kondisi=true;
+        function reactivedKategori(){
+          $("#kategori-nonaktif").removeClass("d-none");
+          if(kondisi){
+            $("#kategori-aktif").attr("hidden",true);
+            $("#kategori-nonaktif").attr("hidden",false);
+            $("#title-card").html("List Kategori Ascore NonAktif")
+            $("#btn-reactived").html("Active Kategori")
+            kondisi=false;
+          }else{
+            $("#kategori-aktif").attr("hidden",false);
+            $("#kategori-nonaktif").attr("hidden",true);
+            $("#title-card").html("List Kategori Ascore Aktif")
+            $("#btn-reactived").html("NonActive Kategori")
+            kondisi=true;
+          }
+        }
+
+        function changeOperator(val) {
+          //console.log(val);
+          if (val == "LENGTH") {
+            $("#length_group").attr("hidden", false);
+          } else {
+            $("#length_group").attr("hidden", true);
+          }
+        }
+
+        function deleteKategori(val) {
+          $.ajax({
+            url: "/api/kategori/delete?id=" + val,
+            type: "put",
+            contentType: "application/json",
+            success: function (data) {
+              console.log(data);
+              location.reload();
+            },
+          });
+        }
+        function aktivasiKategori(val) {
+          $.ajax({
+            url: "/api/kategori/reactived?id=" + val,
+            type: "put",
+            contentType: "application/json",
+            success: function (data) {
+              console.log(data);
+              location.reload();
+            },
+          });
+        }
+
+        let int_params = ["value1", "value2", "score", "is_slik"];
+        let redirects = false;
+
+        function postAscore(val) {
+          const form = document.querySelector("form");
+          const formData = new FormData(form);
+          let str_json = "";
+          for (const pair of formData.entries()) {
+            if (pair[1] != "") {
+              if (int_params.includes(pair[0])) {
+                str_json += `"${pair[0]}":${pair[1]}`;
+              } else {
+                str_json += `"${pair[0]}":"${pair[1]}"`;
+              }
+              str_json += `,`;
+            }
+          }
+          str_json += `"status_data":true`;
+          console.log(str_json);
+          let new_url = "/api/postKategoriAscore";
+          if (val == "edit") {
+            //new_url = "/api/editKategoriAscore";
+            str_json += `,"id":` + $("#hide_id").val();
+          }
+          let json_post = "{" + str_json + "}";
+          console.log(JSON.parse(json_post));
+          $.ajax({
+            url: new_url,
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            data: json_post,
+            success: function (data) {
+              if (data.status.includes("berhasil") == false) {
+                toastr.error(data.status);
+                redirects = false;
+                //alert(data.status);
+              } else {
+                toastr.success("Berhasil menginput data");
+                location.href = "/ascore_management/kategori";
+                redirects = true;
+                //alert("Berhasil menginput data");
+              }
+            },
+            error: function (err) {
+              console.log(err);
+            },
+          });
+          console.log(redirects);
+          if (redirects) {
+            location.href = "/ascore_management/kategori";
+          }
+
+          //test.replace("%3D", "=")
+        }
+
+        function editKategori(val) {
+          $("#form_modal_kategori").modal("show");
+          $("#hide_id").val(val);
+          $("#post_ascore").val("edit");
+          $("option:selected").removeAttr("selected");
+          $.ajax({
+            url: "/api/kategori/getById?id=" + val,
+            type: "get",
+            contentType: "application/json",
+            success: function (data1) {
+              $("#namaparam").val(data1.namaparam);
+              $("#operator").val(data1.operator);
+
+              if (data1.operator == "EQUAL") {
+                $("#option_equal").attr("selected", true);
+                $("#length_group").attr("hidden", true);
+              } else if (data1.operator == "BETWEEN") {
+                $("#option_between").attr("selected", true);
+                $("#length_group").attr("hidden", true);
+              } else {
+                $("#option_length").attr("selected", true);
+                $("#length_group").attr("hidden", false);
+              }
+
+              $("#length").val(data1.length);
+              $("#trim_length").val(data1.trim_length);
+            },
+          });
+        }
+      </script>
+    </th:block>
+  </body>
+</html>

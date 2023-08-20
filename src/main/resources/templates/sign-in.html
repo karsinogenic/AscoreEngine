@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <!--begin::Head-->
+  <head>
+    <base href="../../../" />
+    <meta charset="utf-8" />
+
+    <link rel="shortcut icon" href="assets/media/logos/favicon.ico" />
+    <!--begin::Fonts-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <!--end::Fonts-->
+    <!--begin::Global Stylesheets Bundle(used by all pages)-->
+    <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Global Stylesheets Bundle-->
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body id="kt_body" class="app-blank">
+    <!--begin::Theme mode setup on page load-->
+    <script>
+      var defaultThemeMode = "light";
+      var themeMode;
+      if (document.documentElement) {
+        if (document.documentElement.hasAttribute("data-theme-mode")) {
+          themeMode = document.documentElement.getAttribute("data-theme-mode");
+        } else {
+          if (localStorage.getItem("data-theme") !== null) {
+            themeMode = localStorage.getItem("data-theme");
+          } else {
+            themeMode = defaultThemeMode;
+          }
+        }
+        if (themeMode === "system") {
+          themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", themeMode);
+      }
+    </script>
+    <!--end::Theme mode setup on page load-->
+    <!--begin::Main-->
+    <!--begin::Root-->
+    <div class="d-flex flex-column flex-root">
+      <!--begin::Authentication - Sign-in -->
+      <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+        <!--begin::Body-->
+        <div class="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 order-2 order-lg-1">
+          <!--begin::Form-->
+          <div class="d-flex flex-center flex-column flex-lg-row-fluid">
+            <!--begin::Wrapper-->
+            <div class="w-lg-500px p-10">
+              <!--begin::Form-->
+              <form class="form-signin" method="post" action="/login">
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <div th:if="${param.error}">
+                  <!-- <spring:message code="message.badCredentials"> </spring:message> -->
+                </div>
+
+                <div th:if="${param.logout}">You have been logged out.</div>
+                <!-- <div class="alert alert-danger" role="alert">Tidak Diizinkan</div> -->
+                <p>
+                  <label for="username" class="sr-only">Username</label>
+                  <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus />
+                </p>
+                <p>
+                  <label for="password" class="sr-only">Password</label>
+                  <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
+                </p>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+              </form>
+              <!--end::Form-->
+            </div>
+            <!--end::Wrapper-->
+          </div>
+        </div>
+        <!--end::Body-->
+        <!--begin::Aside-->
+        <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style="background-image: url(image/semua.jpg)">
+          <!--begin::Content-->
+          <div>
+            <!--begin::Logo-->
+            <a href="www.bankmega.com" class="mb-0 mb-lg-12" style="padding-left: 95%">
+              <img alt="Logo" src="image/mega_logo.png" class="h-60px h-lg-75px" />
+            </a>
+            <!--end::Logo-->
+            <!--begin::Image-->
+            <div class="d-none d-lg-block mx-auto w-275px w-md-50 w-xl-500px mb-10 mb-lg-20" alt=""></div>
+          </div>
+          <!--end::Content-->
+        </div>
+        <!--end::Aside-->
+      </div>
+      <!--end::Authentication - Sign-in-->
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+    <script src="assets/plugins/global/plugins.bundle.js"></script>
+    <script>
+      $(function () {
+        var pathname = window.location.href; // Returns path only (/path/example.html)
+        console.log(pathname);
+        if (pathname.includes("error")) {
+          Swal.fire({
+            text: "Tidak diizinkan",
+            icon: "error",
+            buttonsStyling: false,
+            confirmButtonText: "Ok, got it!",
+            customClass: {
+              confirmButton: "btn btn-primary",
+            },
+          });
+        }
+      });
+    </script>
+  </body>
+  <!--end::Body-->
+</html>
